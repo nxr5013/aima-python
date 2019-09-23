@@ -4,7 +4,7 @@ from search import Node
 
 root = None
 current = None
-frontier = []
+front = []
 
 window = Tk()
 window.geometry('950x1150')
@@ -128,33 +128,33 @@ def clear():
 
 
 def add_node(node):
-    global current, root, frontier
+    global current, root, front
     if current is None:
         root = TreeNode(data=node.state, parent=node.parent)
-        frontier.append(root)
+        front.append(root)
     else:
         new_node = TreeNode(data=node.state, parent=current)
         current.children += [new_node]
-        frontier.append(new_node)
+        front.append(new_node)
 
 
 def remove_node(node):
-    global frontier
-    for leaf in frontier:
+    global front
+    for leaf in front:
         if leaf.data == node.state and leaf.parent.data == node.parent.state:
             papi = leaf.parent
             papi.children.remove(leaf)
-            frontier.remove(leaf)
+            front.remove(leaf)
             break
 
 
 def mark_exploring(node):
-    global frontier, current
-    for n in frontier:
+    global front, current
+    for n in front:
         if n.data == node.state and n.parent.data == node.parent.state:
             n.status = 'e'
             current = n
-            frontier.remove(n)
+            front.remove(n)
             break
 
 
@@ -175,10 +175,10 @@ def mark_target(node):
 
 
 def reset_tree():
-    global root, current, frontier
+    global root, current, front
     root = None
     current = None
-    frontier = []
+    front = []
 
 
 def main():

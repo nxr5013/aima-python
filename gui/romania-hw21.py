@@ -20,7 +20,6 @@ goal = None
 counter = -1
 city_map = None
 frontier = None
-front = None
 node = None
 next_button = None
 explored = None
