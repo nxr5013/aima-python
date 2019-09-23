@@ -118,6 +118,7 @@ class TreeNode:
 
 def draw_tree():
     global root
+    clear()
     root.horizontal_distance()
     root.draw()
 
@@ -137,10 +138,20 @@ def add_node(node):
         frontier.append(new_node)
 
 
+def remove_node(node):
+    global frontier
+    for leaf in frontier:
+        if leaf.data == node.state and leaf.parent.data == node.parent.state:
+            papi = leaf.parent
+            papi.children.remove(leaf)
+            frontier.remove(leaf)
+            break
+
+
 def mark_exploring(node):
     global frontier, current
     for n in frontier:
-        if n.data == node.state:
+        if n.data == node.state and n.parent.data == node.parent.state:
             n.status = 'e'
             current = n
             frontier.remove(n)
@@ -162,6 +173,12 @@ def mark_target(node):
     global current
     set_path(current)
 
+
+def reset_tree():
+    global root, current, frontier
+    root = None
+    current = None
+    frontier = []
 
 
 def main():
