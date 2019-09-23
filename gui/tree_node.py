@@ -1,4 +1,4 @@
-from tkinter import Tk, Canvas
+from tkinter import Tk, Canvas, Scrollbar, HORIZONTAL, BOTTOM, VERTICAL, X, Y, BOTH, LEFT, RIGHT
 from math import floor
 from search import Node
 
@@ -7,9 +7,19 @@ current = None
 frontier = []
 
 window = Tk()
-window.geometry('950x1150')
-canvas = Canvas(window, width=950, height=1100)
-canvas.pack()
+window.geometry('800x800')
+canvas = Canvas(window, width=500, height=500, scrollregion=(0,0,10000,10000))
+hbar=Scrollbar(window,orient=HORIZONTAL)
+hbar.pack(side=BOTTOM,fill=X)
+hbar.config(command=canvas.xview)
+
+vbar=Scrollbar(window,orient=VERTICAL)
+vbar.pack(side=RIGHT,fill=Y)
+vbar.config(command=canvas.yview)
+canvas.xview_moveto(0.45)
+canvas.config(xscrollcommand=hbar.set, yscrollcommand=vbar.set)
+
+canvas.pack(side=LEFT,expand=True,fill=BOTH)
 
 
 class TreeNode:
@@ -25,13 +35,15 @@ class TreeNode:
     def draw(self):
         global canvas
         if self.x is None and self.y is None:
-            self.x = self.width / 2.0 + 10.0
+            self.x = self.width / 2.0 + 245.0
             self.y = 5.0
 
-        canvas.create_oval(self.x * 20 + 20, self.y * 30 + 20, self.x * 20 - 20, self.y * 30 - 20, fill=self.color())
+        canvas.create_oval(self.x * 20 + 20, self.y * 30 + 20, self.x *
+                           20 - 20, self.y * 30 - 20, fill=self.color())
         canvas.create_text(self.x * 20, self.y * 30, text=self.data[0])
         if self.parent is not None:
-            canvas.create_line(self.parent.x * 20, self.parent.y * 30 + 20, self.x * 20, self.y * 30 - 20)
+            canvas.create_line(self.parent.x * 20, self.parent.y *
+                               30 + 20, self.x * 20, self.y * 30 - 20)
 
         if self.children:
             middle_idx = len(self.children) // 2
