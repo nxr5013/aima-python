@@ -93,13 +93,13 @@ class TreeNode:
             child.y = self.y + 2
         child.draw()
 
-    def horizontal_distance(self):
+    def calculate_horizontal_distance(self):
         if not self.children:
             return 2
 
         total = 0
         for child in self.children:
-            total += child.horizontal_distance()
+            total += child.calculate_horizontal_distance()
 
         self.width = total + len(self.children) - 1
         return self.width
@@ -138,7 +138,7 @@ class TreeNode:
 def draw_tree():
     global root
     clear()
-    root.horizontal_distance()
+    root.calculate_horizontal_distance()
     root.draw()
 
 
