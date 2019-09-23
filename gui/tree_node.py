@@ -115,6 +115,26 @@ class TreeNode:
         elif self.status == 't':
             return 'green'
 
+    def find_right_spot(self, node):
+        if self.data == node.parent.state:
+            match = True
+            for child in self.children:
+                if child.data == node.state:
+                    match = False
+                    break
+            if match:
+                return self
+            else:
+                for child in self.children:
+                    spot = child.find_right_spot(node)
+                    if spot is not None:
+                        return spot
+        else:
+            for child in self.children:
+                spot = child.find_right_spot(node)
+                if spot is not None:
+                    return spot
+
 
 def draw_tree():
     global root
@@ -133,9 +153,16 @@ def add_node(node):
         root = TreeNode(data=node.state, parent=None)
         front.append(root)
     else:
-        new_node = TreeNode(data=node.state, parent=current)
-        current.children += [new_node]
-        front.append(new_node)
+        if current.data == node.parent.state:
+            new_node = TreeNode(data=node.state, parent=current)
+            current.children += [new_node]
+            front.append(new_node)
+
+        else:
+            parent = root.find_right_spot(node)
+            new_node = TreeNode(data=node.state, parent=parent)
+            parent.children.append(new_node)
+            front.append(new_node)
 
 
 def remove_node(node):
@@ -172,8 +199,19 @@ def set_path(node):
 
 
 def mark_target(node):
-    global current
-    set_path(current)
+    global current, root, front
+
+    if current.data == node.state:
+        set_path(current)
+
+    else:
+        for child in front:
+            if child.data == node.state:
+                if child == root or child.parent.data == node.parent.state:
+                    set_path(child)
+                    return
+        add_node(node)
+        set_path(front[-1])
 
 
 def reset_tree():
@@ -208,7 +246,6 @@ def main():
     # child7.children = [grandchild2]
     #
     # print(root.horizontal_distance())
-
     window.mainloop()
 
 
