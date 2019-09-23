@@ -435,6 +435,10 @@ def breadth_first_tree_search(problem):
 
     if counter % 3 == 2 and counter >= 0:
         display_explored(node)
+        mark_explored(node)
+        clear()
+        draw_tree()
+
     return None
 
 
