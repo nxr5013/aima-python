@@ -2,7 +2,6 @@ from tkinter import Tk, Canvas
 from math import floor
 from search import Node
 
-
 root = None
 current = None
 frontier = []
@@ -32,7 +31,7 @@ class TreeNode:
         canvas.create_oval(self.x * 20 + 20, self.y * 30 + 20, self.x * 20 - 20, self.y * 30 - 20, fill=self.color())
         canvas.create_text(self.x * 20, self.y * 30, text=self.data[0])
         if self.parent is not None:
-            canvas.create_line(self.parent.x * 20, self.parent.y * 30 + 20, self.x * 20, self.y * 30 - 20) 
+            canvas.create_line(self.parent.x * 20, self.parent.y * 30 + 20, self.x * 20, self.y * 30 - 20)
 
         if self.children:
             middle_idx = len(self.children) // 2
@@ -119,6 +118,7 @@ class TreeNode:
 
 def draw_tree():
     global root
+    root.horizontal_distance()
     root.draw()
 
 
@@ -144,6 +144,11 @@ def mark_exploring(node):
             n.status = 'e'
             current = n
             frontier.remove(n)
+
+
+def mark_explored(node):
+    global current
+    current.status = 'd'
 
 
 def main():
