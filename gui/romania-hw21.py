@@ -9,6 +9,7 @@ from search import breadth_first_tree_search as bfts, depth_first_tree_search as
     astar_search as asts
 from utils import PriorityQueue
 from copy import deepcopy
+from gui.tree_node import *
 
 root = None
 city_coord = {}
@@ -407,20 +408,39 @@ def breadth_first_tree_search(problem):
 
     if counter == -1:
         frontier.append(Node(problem.initial))
-
         display_frontier(frontier)
+
+        add_node(frontier[0])
+        draw_tree()
+
     if counter % 3 == 0 and counter >= 0:
         node = frontier.popleft()
-
         display_current(node)
+
+        mark_exploring(node)
+        clear()
+        draw_tree()
+
     if counter % 3 == 1 and counter >= 0:
         if problem.goal_test(node.state):
             return node
-        frontier.extend(node.expand(problem))
 
+        children = node.expand(problem)
+        frontier.extend(children)
         display_frontier(frontier)
+
+        for child in children:
+            add_node(child)
+        clear()
+        draw_tree()
+
     if counter % 3 == 2 and counter >= 0:
         display_explored(node)
+
+        mark_explored(node)
+        clear()
+        draw_tree()
+
     return None
 
 
@@ -433,12 +453,19 @@ def depth_first_tree_search(problem):
 
     if counter == -1:
         frontier.append(Node(problem.initial))
-
         display_frontier(frontier)
+
+        add_node(frontier[0])
+        draw_tree()
+
     if counter % 3 == 0 and counter >= 0:
         node = frontier.pop()
-
         display_current(node)
+
+        mark_exploring(node)
+        clear()
+        draw_tree()
+
     if counter % 3 == 1 and counter >= 0:
         if problem.goal_test(node.state):
             return node
@@ -576,6 +603,11 @@ def on_click():
             final_path.append(start.get())
             display_final(final_path)
             next_button.config(state="disabled")
+
+            mark_target(node)
+            clear()
+            draw_tree()
+
         counter += 1
     elif "Depth-First Tree Search" == algo.get():
         node = depth_first_tree_search(romania_problem)

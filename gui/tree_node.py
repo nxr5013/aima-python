@@ -1,26 +1,37 @@
 from tkinter import Tk, Canvas
 from math import floor
+from search import Node
+
+root = None
+current = None
+frontier = []
+
+window = Tk()
+window.geometry('950x1150')
+canvas = Canvas(window, width=950, height=1100)
+canvas.pack()
 
 
 class TreeNode:
-    def __init__(self, data, parent, children=list()):
+    def __init__(self, data, parent=None, children=[]):
         self.data = data
         self.parent = parent
-        self.children = children
+        self.children = []
         self.status = 'f'
         self.width = 2
         self.x = None
         self.y = None
 
-    def draw_dots(self, canvas):
+    def draw(self):
+        global canvas
         if self.x is None and self.y is None:
             self.x = self.width / 2.0 + 10.0
             self.y = 5.0
 
-        canvas.create_oval(self.x * 20 + 20, self.y * 30 + 20, self.x * 20 - 20, self.y * 30 - 20, fill='orange')
+        canvas.create_oval(self.x * 20 + 20, self.y * 30 + 20, self.x * 20 - 20, self.y * 30 - 20, fill=self.color())
         canvas.create_text(self.x * 20, self.y * 30, text=self.data[0])
         if self.parent is not None:
-            canvas.create_line(self.parent.x * 20, self.parent.y * 30 + 20, self.x * 20, self.y * 30 - 20) 
+            canvas.create_line(self.parent.x * 20, self.parent.y * 30 + 20, self.x * 20, self.y * 30 - 20)
 
         if self.children:
             middle_idx = len(self.children) // 2
@@ -29,19 +40,19 @@ class TreeNode:
                 middle_child = self.children[middle_idx]
                 middle_child.x = self.x
                 middle_child.y = self.y + 2
-                middle_child.draw_dots(canvas)
+                middle_child.draw()
 
                 for idx in range(0, middle_idx):
-                    self.draw_odd_child(idx, middle_idx, canvas)
+                    self.draw_odd_child(idx, middle_idx)
 
                 for idx in range(middle_idx + 1, len(self.children)):
-                    self.draw_odd_child(idx, middle_idx, canvas)
+                    self.draw_odd_child(idx, middle_idx)
 
             else:
                 for idx in range(0, len(self.children)):
-                    self.draw_even_child(idx, middle_idx, canvas)
+                    self.draw_even_child(idx, middle_idx)
 
-    def draw_odd_child(self, idx, middle_idx, canvas):
+    def draw_odd_child(self, idx, middle_idx):
         child = self.children[idx]
         padding = 0
         if idx < middle_idx:
@@ -60,9 +71,9 @@ class TreeNode:
             padding += child.width / 2.0
             child.x = self.x + padding
             child.y = self.y + 2
-        child.draw_dots(canvas)
+        child.draw()
 
-    def draw_even_child(self, idx, middle_idx, canvas):
+    def draw_even_child(self, idx, middle_idx):
         child = self.children[idx]
         padding = 0
         if idx < middle_idx:
@@ -81,7 +92,7 @@ class TreeNode:
             padding += child.width / 2
             child.x = self.x + padding
             child.y = self.y + 2
-        child.draw_dots(canvas)
+        child.draw()
 
     def horizontal_distance(self):
         if not self.children:
@@ -94,41 +105,93 @@ class TreeNode:
         self.width = total + len(self.children) - 1
         return self.width
 
+    def color(self):
+        if self.status == 'f':
+            return 'orange'
+        elif self.status == 'e':
+            return 'red'
+        elif self.status == 'd':
+            return 'grey'
+        elif self.status == 't':
+            return 'green'
+
+
+def draw_tree():
+    global root
+    root.horizontal_distance()
+    root.draw()
+
+
+def clear():
+    canvas.delete('all')
+
+
+def add_node(node):
+    global current, root, frontier
+    if current is None:
+        root = TreeNode(data=node.state, parent=node.parent)
+        frontier.append(root)
+    else:
+        new_node = TreeNode(data=node.state, parent=current)
+        current.children += [new_node]
+        frontier.append(new_node)
+
+
+def mark_exploring(node):
+    global frontier, current
+    for n in frontier:
+        if n.data == node.state:
+            n.status = 'e'
+            current = n
+            frontier.remove(n)
+            break
+
+
+def mark_explored(node):
+    global current
+    current.status = 'd'
+
+
+def set_path(node):
+    node.status = 't'
+    if node.parent:
+        set_path(node.parent)
+
+
+def mark_target(node):
+    global current
+    set_path(current)
+
+
 
 def main():
-    root = TreeNode("root", None)
-    parent1 = TreeNode("parent1", root)
-    child1 = TreeNode("child1", parent1)
-    child2 = TreeNode("child2", parent1)
-    child3 = TreeNode("child3", parent1)
-    child4 = TreeNode("child4", parent1)
+    # root = TreeNode("root", None)
+    # parent1 = TreeNode("parent1", root)
+    # child1 = TreeNode("child1", parent1)
+    # child2 = TreeNode("child2", parent1)
+    # child3 = TreeNode("child3", parent1)
+    # child4 = TreeNode("child4", parent1)
+    #
+    # parent2 = TreeNode("parent2", root)
+    # child5 = TreeNode("child5", parent2)
+    # child6 = TreeNode("child6", parent2)
+    # child7 = TreeNode("child7", parent2)
+    # child8 = TreeNode('child8', parent2)
+    # # child10 = SearchNode('child10', parent1)
+    #
+    # grandchild1 = TreeNode("grandchild1", child6)
+    # grandchild2 = TreeNode("grandchild2", child7)
+    # # child9 = SearchNode('child9', parent3)
+    # root.children = [parent1, parent2]
+    # parent1.children = [child1, child2, child3, child4]
+    # parent2.children = [child5, child6, child7, child8]
+    # child6.children = [grandchild1]
+    # child7.children = [grandchild2]
+    #
+    # print(root.horizontal_distance())
 
-    parent2 = TreeNode("parent2", root)
-    child5 = TreeNode("child5", parent2)
-    child6 = TreeNode("child6", parent2)
-    child7 = TreeNode("child7", parent2)
-    child8 = TreeNode('child8', parent2)
-    # child10 = SearchNode('child10', parent1)
-
-    grandchild1 = TreeNode("grandchild1", child6)
-    grandchild2 = TreeNode("grandchild2", child7)
-    # child9 = SearchNode('child9', parent3)
-    root.children = [parent1, parent2]
-    parent1.children = [child1, child2, child3, child4]
-    parent2.children = [child5, child6, child7, child8]
-    child6.children = [grandchild1]
-    child7.children = [grandchild2]
-
-    print(root.horizontal_distance())
-
-    window = Tk()
-    window.geometry('950x1100')
-    canvas = Canvas(window, width=950, height=1100)
-    canvas.pack()
-
-    root.draw_dots(canvas)
     window.mainloop()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
