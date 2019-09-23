@@ -1,6 +1,5 @@
 from tkinter import Tk, Canvas
 from math import floor
-from search import Node
 
 root = None
 current = None
