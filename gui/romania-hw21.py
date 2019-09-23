@@ -737,6 +737,7 @@ def reset_map():
         city_map.itemconfig(city_coord[city], fill="white")
     next_button.config(state="normal")
     reset_tree()
+    draw_tree()
 
 # TODO: Add more search algorithms in the OptionMenu
 

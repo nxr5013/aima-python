@@ -13,7 +13,7 @@ canvas.pack()
 
 
 class TreeNode:
-    def __init__(self, data, parent=None, children=[]):
+    def __init__(self, data, parent):
         self.data = data
         self.parent = parent
         self.children = []
@@ -130,7 +130,7 @@ def clear():
 def add_node(node):
     global current, root, front
     if current is None:
-        root = TreeNode(data=node.state, parent=node.parent)
+        root = TreeNode(data=node.state, parent=None)
         front.append(root)
     else:
         new_node = TreeNode(data=node.state, parent=current)
@@ -139,23 +139,25 @@ def add_node(node):
 
 
 def remove_node(node):
-    global front
+    global front, root
     for leaf in front:
-        if leaf.data == node.state and leaf.parent.data == node.parent.state:
-            papi = leaf.parent
-            papi.children.remove(leaf)
-            front.remove(leaf)
-            break
+        if leaf.data == node.state:
+            if leaf == root or leaf.parent.data == node.parent:
+                papi = leaf.parent
+                papi.children.remove(leaf)
+                front.remove(leaf)
+                break
 
 
 def mark_exploring(node):
     global front, current
     for n in front:
-        if n.data == node.state and n.parent.data == node.parent.state:
-            n.status = 'e'
-            current = n
-            front.remove(n)
-            break
+        if n.data == node.state:
+            if n == root or n.parent.data == node.parent:
+                n.status = 'e'
+                current = n
+                front.remove(n)
+                break
 
 
 def mark_explored(node):
