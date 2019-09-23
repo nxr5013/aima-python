@@ -153,7 +153,7 @@ def mark_exploring(node):
     global front, current
     for n in front:
         if n.data == node.state:
-            if n == root or n.parent.data == node.parent:
+            if n == root or n.parent.data == node.parent.state:
                 n.status = 'e'
                 current = n
                 front.remove(n)
