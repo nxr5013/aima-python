@@ -119,7 +119,6 @@ class TreeNode:
 def draw_tree():
     global root
     root.horizontal_distance()
-    print(root.width)
     root.draw()
 
 
@@ -151,6 +150,18 @@ def mark_exploring(node):
 def mark_explored(node):
     global current
     current.status = 'd'
+
+
+def set_path(node):
+    node.status = 't'
+    if node.parent:
+        set_path(node.parent)
+
+
+def mark_target(node):
+    global current
+    set_path(current)
+
 
 
 def main():
