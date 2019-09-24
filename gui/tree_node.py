@@ -27,22 +27,20 @@ class TreeNode:
         self.parent = parent
         self.children = []
         self.status = 'f'
-        self.width = 2
+        self.width = 40
         self.x = None
         self.y = None
 
     def draw(self):
         global canvas
         if self.x is None and self.y is None:
-            self.x = self.width / 2.0 + 245.0
-            self.y = 5.0
+            self.x = self.width / 2.0 + 4900
+            self.y = 100.0
 
-        canvas.create_oval(self.x * 20 + 20, self.y * 20 + 20, self.x *
-                           20 - 20, self.y * 20 - 20, fill=self.color())
-        canvas.create_text(self.x * 20, self.y * 20, text=self.data[0])
+        canvas.create_oval(self.x + 20, self.y + 20, self.x - 20, self.y - 20, fill=self.color())
+        canvas.create_text(self.x, self.y, text=self.data[0])
         if self.parent is not None:
-            canvas.create_line(self.parent.x * 20, self.parent.y *
-                               20 + 20, self.x * 20, self.y * 20 - 20)
+            canvas.create_line(self.parent.x, self.parent.y + 20, self.x, self.y - 20)
 
         if self.children:
             middle_idx = len(self.children) // 2
@@ -50,7 +48,7 @@ class TreeNode:
             if len(self.children) % 2 != 0:
                 middle_child = self.children[middle_idx]
                 middle_child.x = self.x
-                middle_child.y = self.y + 3
+                middle_child.y = self.y + 60
                 middle_child.draw()
 
                 for idx in range(0, middle_idx):
@@ -69,19 +67,19 @@ class TreeNode:
         if idx < middle_idx:
             for i in range(idx + 1, middle_idx):
                 padding += self.children[i].width
-            padding += floor(len(self.children) // 2)
+            padding += floor(len(self.children) // 2) * 20
             padding += self.children[middle_idx].width / 2.0
             padding += child.width / 2.0
             child.x = self.x - padding
-            child.y = self.y + 3
+            child.y = self.y + 60
         elif idx > middle_idx:
             for i in range(middle_idx + 1, idx):
                 padding += self.children[i].width
-            padding += floor(len(self.children) // 2)
+            padding += floor(len(self.children) // 2) * 20
             padding += self.children[middle_idx].width / 2.0
             padding += child.width / 2.0
             child.x = self.x + padding
-            child.y = self.y + 3
+            child.y = self.y + 60
         child.draw()
 
     def draw_even_child(self, idx, middle_idx):
@@ -90,30 +88,30 @@ class TreeNode:
         if idx < middle_idx:
             for i in range(idx + 1, middle_idx):
                 padding += self.children[i].width
-            padding += (len(self.children) // 2) - idx - 1
-            padding += 0.5
+            padding += ((len(self.children) // 2) - idx - 1) * 20
+            padding += 10
             padding += child.width / 2
             child.x = self.x - padding
-            child.y = self.y + 3
+            child.y = self.y + 60
         else:
             for i in range(middle_idx, idx):
                 padding += self.children[i].width
-            padding += idx - (len(self.children) // 2)
-            padding += 0.5
+            padding += (idx - (len(self.children) // 2)) * 20
+            padding += 10
             padding += child.width / 2
             child.x = self.x + padding
-            child.y = self.y + 3
+            child.y = self.y + 60
         child.draw()
 
     def calculate_horizontal_distance(self):
         if not self.children:
-            return 2
+            return 40
 
         total = 0
         for child in self.children:
             total += child.calculate_horizontal_distance()
 
-        self.width = total + len(self.children) - 1
+        self.width = total + ((len(self.children) - 1) * 20)
         return self.width
 
     def color(self):
