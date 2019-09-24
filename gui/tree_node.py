@@ -4,6 +4,8 @@ from math import floor
 root = None
 current = None
 front = []
+visited_count = 0
+tree_size = 0
 
 window = Tk()
 window.geometry('800x800')
@@ -157,7 +159,7 @@ def clear():
 
 
 def add_node(node):
-    global current, root, front
+    global current, root, front, tree_size
     if current is None:
         root = TreeNode(data=node.state, parent=None)
         front.append(root)
@@ -173,15 +175,18 @@ def add_node(node):
             parent.children.append(new_node)
             front.append(new_node)
 
+    tree_size += 1
+
 
 def remove_node(node):
-    global front, root
+    global front, root, tree_size
     for leaf in front:
         if leaf.data == node.state:
             if leaf == root or leaf.parent.data == node.parent:
                 papi = leaf.parent
                 papi.children.remove(leaf)
                 front.remove(leaf)
+                tree_size -= 1
                 break
 
 
@@ -197,8 +202,9 @@ def mark_exploring(node):
 
 
 def mark_explored(node):
-    global current
+    global current, visited_count
     current.status = 'd'
+    visited_count += 1
 
 
 def set_path(node):
@@ -224,10 +230,12 @@ def mark_target(node):
 
 
 def reset_tree():
-    global root, current, front
+    global root, current, front, visited_count, tree_size
     root = None
     current = None
     front = []
+    visited_count = 0
+    tree_size = 0
 
 
 def main():
