@@ -187,35 +187,3 @@ def reset_tree():
     front = []
     visited_count = 0
     tree_size = 0
-
-
-def main():
-    # root = TreeNode("root", None)
-    # parent1 = TreeNode("parent1", root)
-    # child1 = TreeNode("child1", parent1)
-    # child2 = TreeNode("child2", parent1)
-    # child3 = TreeNode("child3", parent1)
-    # child4 = TreeNode("child4", parent1)
-    #
-    # parent2 = TreeNode("parent2", root)
-    # child5 = TreeNode("child5", parent2)
-    # child6 = TreeNode("child6", parent2)
-    # child7 = TreeNode("child7", parent2)
-    # child8 = TreeNode('child8', parent2)
-    # # child10 = SearchNode('child10', parent1)
-    #
-    # grandchild1 = TreeNode("grandchild1", child6)
-    # grandchild2 = TreeNode("grandchild2", child7)
-    # # child9 = SearchNode('child9', parent3)
-    # root.children = [parent1, parent2]
-    # parent1.children = [child1, child2, child3, child4]
-    # parent2.children = [child5, child6, child7, child8]
-    # child6.children = [grandchild1]
-    # child7.children = [grandchild2]
-    #
-    # print(root.horizontal_distance())
-    window.mainloop()
-
-
-if __name__ == '__main__':
-    main()
