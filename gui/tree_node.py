@@ -1,10 +1,9 @@
 from tkinter import Tk, Canvas, Scrollbar, HORIZONTAL, BOTTOM, VERTICAL, X, Y, BOTH, LEFT, RIGHT
 from math import floor
-from search import Node
 
 root = None
 current = None
-frontier = []
+front = []
 
 window = Tk()
 window.geometry('800x800')
@@ -23,7 +22,7 @@ canvas.pack(side=LEFT,expand=True,fill=BOTH)
 
 
 class TreeNode:
-    def __init__(self, data, parent=None, children=[]):
+    def __init__(self, data, parent):
         self.data = data
         self.parent = parent
         self.children = []
@@ -106,13 +105,13 @@ class TreeNode:
             child.y = self.y + 2
         child.draw()
 
-    def horizontal_distance(self):
+    def calculate_horizontal_distance(self):
         if not self.children:
             return 2
 
         total = 0
         for child in self.children:
-            total += child.horizontal_distance()
+            total += child.calculate_horizontal_distance()
 
         self.width = total + len(self.children) - 1
         return self.width
@@ -127,10 +126,31 @@ class TreeNode:
         elif self.status == 't':
             return 'green'
 
+    def find_right_spot(self, node):
+        if self.data == node.parent.state:
+            match = True
+            for child in self.children:
+                if child.data == node.state:
+                    match = False
+                    break
+            if match:
+                return self
+            else:
+                for child in self.children:
+                    spot = child.find_right_spot(node)
+                    if spot is not None:
+                        return spot
+        else:
+            for child in self.children:
+                spot = child.find_right_spot(node)
+                if spot is not None:
+                    return spot
+
 
 def draw_tree():
     global root
-    root.horizontal_distance()
+    clear()
+    root.calculate_horizontal_distance()
     root.draw()
 
 
@@ -139,24 +159,43 @@ def clear():
 
 
 def add_node(node):
-    global current, root, frontier
+    global current, root, front
     if current is None:
-        root = TreeNode(data=node.state, parent=node.parent)
-        frontier.append(root)
+        root = TreeNode(data=node.state, parent=None)
+        front.append(root)
     else:
-        new_node = TreeNode(data=node.state, parent=current)
-        current.children += [new_node]
-        frontier.append(new_node)
+        if current.data == node.parent.state:
+            new_node = TreeNode(data=node.state, parent=current)
+            current.children += [new_node]
+            front.append(new_node)
+
+        else:
+            parent = root.find_right_spot(node)
+            new_node = TreeNode(data=node.state, parent=parent)
+            parent.children.append(new_node)
+            front.append(new_node)
+
+
+def remove_node(node):
+    global front, root
+    for leaf in front:
+        if leaf.data == node.state:
+            if leaf == root or leaf.parent.data == node.parent:
+                papi = leaf.parent
+                papi.children.remove(leaf)
+                front.remove(leaf)
+                break
 
 
 def mark_exploring(node):
-    global frontier, current
-    for n in frontier:
+    global front, current
+    for n in front:
         if n.data == node.state:
-            n.status = 'e'
-            current = n
-            frontier.remove(n)
-            break
+            if n == root or n.parent.data == node.parent.state:
+                n.status = 'e'
+                current = n
+                front.remove(n)
+                break
 
 
 def mark_explored(node):
@@ -171,9 +210,26 @@ def set_path(node):
 
 
 def mark_target(node):
-    global current
-    set_path(current)
+    global current, root, front
 
+    if current.data == node.state:
+        set_path(current)
+
+    else:
+        for child in front:
+            if child.data == node.state:
+                if child == root or child.parent.data == node.parent.state:
+                    set_path(child)
+                    return
+        add_node(node)
+        set_path(front[-1])
+
+
+def reset_tree():
+    global root, current, front
+    root = None
+    current = None
+    front = []
 
 
 def main():
@@ -201,7 +257,6 @@ def main():
     # child7.children = [grandchild2]
     #
     # print(root.horizontal_distance())
-
     window.mainloop()
 
 

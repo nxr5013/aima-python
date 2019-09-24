@@ -20,7 +20,6 @@ goal = None
 counter = -1
 city_map = None
 frontier = None
-front = None
 node = None
 next_button = None
 explored = None
@@ -403,6 +402,7 @@ def display_final(cities):
 def breadth_first_tree_search(problem):
     """Search the shallowest nodes in the search tree first."""
     global frontier, counter, node
+
     if counter == -1:
         frontier = deque()
 
@@ -418,7 +418,6 @@ def breadth_first_tree_search(problem):
         display_current(node)
 
         mark_exploring(node)
-        clear()
         draw_tree()
 
     if counter % 3 == 1 and counter >= 0:
@@ -431,14 +430,12 @@ def breadth_first_tree_search(problem):
 
         for child in children:
             add_node(child)
-        clear()
         draw_tree()
 
     if counter % 3 == 2 and counter >= 0:
         display_explored(node)
 
         mark_explored(node)
-        clear()
         draw_tree()
 
     return None
@@ -448,6 +445,7 @@ def depth_first_tree_search(problem):
     """Search the deepest nodes in the search tree first."""
     # This search algorithm might not work in case of repeated paths.
     global frontier, counter, node
+
     if counter == -1:
         frontier = []  # stack
 
@@ -463,23 +461,33 @@ def depth_first_tree_search(problem):
         display_current(node)
 
         mark_exploring(node)
-        clear()
         draw_tree()
 
     if counter % 3 == 1 and counter >= 0:
         if problem.goal_test(node.state):
             return node
-        frontier.extend(node.expand(problem))
 
+        children = node.expand(problem)
+        frontier.extend(children)
         display_frontier(frontier)
+
+        for child in children:
+            add_node(child)
+        draw_tree()
+
     if counter % 3 == 2 and counter >= 0:
         display_explored(node)
+
+        mark_explored(node)
+        draw_tree()
+
     return None
 
 
 def breadth_first_graph_search(problem):
     """[Figure 3.11]"""
     global frontier, node, explored, counter
+
     if counter == -1:
         node = Node(problem.initial)
         display_current(node)
@@ -487,50 +495,83 @@ def breadth_first_graph_search(problem):
             return node
 
         frontier = deque([node])  # FIFO queue
-
         display_frontier(frontier)
         explored = set()
+
+        add_node(frontier[0])
+        draw_tree()
+
     if counter % 3 == 0 and counter >= 0:
         node = frontier.popleft()
         display_current(node)
         explored.add(node.state)
+
+        mark_exploring(node)
+        draw_tree()
+
     if counter % 3 == 1 and counter >= 0:
-        for child in node.expand(problem):
+        children = node.expand(problem)
+        for child in children:
             if child.state not in explored and child not in frontier:
                 if problem.goal_test(child.state):
                     return child
                 frontier.append(child)
+                add_node(child)
+
         display_frontier(frontier)
+        draw_tree()
+
     if counter % 3 == 2 and counter >= 0:
         display_explored(node)
+
+        mark_explored(node)
+        draw_tree()
+
     return None
 
 
 def depth_first_graph_search(problem):
     """Search the deepest nodes in the search tree first."""
     global counter, frontier, node, explored
+
     if counter == -1:
         frontier = []  # stack
+
     if counter == -1:
         frontier.append(Node(problem.initial))
         explored = set()
-
         display_frontier(frontier)
+
+        add_node(frontier[0])
+        draw_tree()
+
     if counter % 3 == 0 and counter >= 0:
         node = frontier.pop()
-
         display_current(node)
+
+        mark_exploring(node)
+        draw_tree()
+
     if counter % 3 == 1 and counter >= 0:
         if problem.goal_test(node.state):
             return node
+
         explored.add(node.state)
-        frontier.extend(child for child in node.expand(problem)
-                        if child.state not in explored and
-                        child not in frontier)
+        children = node.expand(problem)
+        for child in children:
+            if child.state not in explored and child not in frontier:
+                frontier.append(child)
+                add_node(child)
 
         display_frontier(frontier)
+        draw_tree()
+
     if counter % 3 == 2 and counter >= 0:
         display_explored(node)
+
+        mark_explored(node)
+        draw_tree()
+
     return None
 
 
@@ -554,23 +595,41 @@ def best_first_graph_search(problem, f):
         frontier.append(node)
         display_frontier(frontier)
         explored = set()
+
+        add_node(node)
+        draw_tree()
+
     if counter % 3 == 0 and counter >= 0:
         node = frontier.pop()
         display_current(node)
         if problem.goal_test(node.state):
             return node
         explored.add(node.state)
+
+        mark_exploring(node)
+        draw_tree()
+
     if counter % 3 == 1 and counter >= 0:
         for child in node.expand(problem):
             if child.state not in explored and child not in frontier:
                 frontier.append(child)
+                add_node(child)
+
             elif child in frontier:
                 if f(child) < frontier[child]:
                     del frontier[child]
                     frontier.append(child)
+                    remove_node(child)
+
         display_frontier(frontier)
+        draw_tree()
+
     if counter % 3 == 2 and counter >= 0:
         display_explored(node)
+
+        mark_explored(node)
+        draw_tree()
+
     return None
 
 
@@ -605,10 +664,10 @@ def on_click():
             next_button.config(state="disabled")
 
             mark_target(node)
-            clear()
             draw_tree()
 
         counter += 1
+
     elif "Depth-First Tree Search" == algo.get():
         node = depth_first_tree_search(romania_problem)
         if node is not None:
@@ -616,6 +675,10 @@ def on_click():
             final_path.append(start.get())
             display_final(final_path)
             next_button.config(state="disabled")
+
+            mark_target(node)
+            draw_tree()
+
         counter += 1
     elif "Breadth-First Graph Search" == algo.get():
         node = breadth_first_graph_search(romania_problem)
@@ -624,6 +687,10 @@ def on_click():
             final_path.append(start.get())
             display_final(final_path)
             next_button.config(state="disabled")
+
+            mark_target(node)
+            draw_tree()
+
         counter += 1
     elif "Depth-First Graph Search" == algo.get():
         node = depth_first_graph_search(romania_problem)
@@ -632,6 +699,10 @@ def on_click():
             final_path.append(start.get())
             display_final(final_path)
             next_button.config(state="disabled")
+
+            mark_target(node)
+            draw_tree()
+
         counter += 1
     elif "Uniform Cost Search" == algo.get():
         node = uniform_cost_search(romania_problem)
@@ -640,6 +711,10 @@ def on_click():
             final_path.append(start.get())
             display_final(final_path)
             next_button.config(state="disabled")
+
+            mark_target(node)
+            draw_tree()
+
         counter += 1
     elif "A* - Search" == algo.get():
         node = astar_search(romania_problem)
@@ -648,6 +723,10 @@ def on_click():
             final_path.append(start.get())
             display_final(final_path)
             next_button.config(state="disabled")
+
+            mark_target(node)
+            draw_tree()
+
         counter += 1
 
 
@@ -657,6 +736,8 @@ def reset_map():
     for city in city_coord.keys():
         city_map.itemconfig(city_coord[city], fill="white")
     next_button.config(state="normal")
+    reset_tree()
+    draw_tree()
 
 # TODO: Add more search algorithms in the OptionMenu
 
