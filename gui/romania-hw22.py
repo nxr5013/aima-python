@@ -635,6 +635,7 @@ def on_click():
     """
     global algo, counter, next_button, romania_problem, start, goal
     romania_problem = GraphProblem(start.get(), goal.get(), romania_map)
+    # print(start.get())
     if "Breadth-First Tree Search" == algo.get():
         node = breadth_first_tree_search(romania_problem)
         if node is not None:
@@ -702,7 +703,7 @@ def on_click():
             mark_target(node)
 
         counter += 1
-
+    
 
 def reset_map():
     global counter, city_coord, city_map, next_button
@@ -764,6 +765,26 @@ def main():
     frame1.pack(side=BOTTOM)
     create_map(root)
     root.mainloop()
+
+
+    places = ["Oradea", "Zerind", "Arad", "Timisoara", "Lugoj", 
+            "Mehadia", "Drobeta", "Craiova", "Rimnicu", "Sibiu", 
+            "Fagaras", "Pitesti", "Bucharest", "Giurgiu", "Urziceni", 
+            "Hisova", "Eforie", "Vaslui", "lasi", "Neamt"]
+    searches = ["Breadth-First Tree Search", "Depth-First Tree Search", "Uniform Cost Search"]
+
+    s1 = 0
+    s2 = 1
+    for search in searches:
+        for i in range(50):
+            start.set(places[s1])
+            goal.set(places[s2])
+            algo.set(search)
+                while next_button.config(state) # Need to bring out a reason for this to constantly keep running. 
+                                                # Probably looking at the state of the button...
+    
+
+
 
 
 if __name__ == "__main__":
