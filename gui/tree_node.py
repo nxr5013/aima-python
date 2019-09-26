@@ -4,6 +4,8 @@ from math import floor
 root = None
 current = None
 front = []
+visited_count = 0
+tree_size = 0
 
 window = Tk()
 window.geometry('800x800')
@@ -39,69 +41,20 @@ class TreeNode:
 
         canvas.create_oval(self.x + 20, self.y + 20, self.x - 20, self.y - 20, fill=self.color())
         canvas.create_text(self.x, self.y, text=self.data[0])
+
         if self.parent is not None:
             canvas.create_line(self.parent.x, self.parent.y + 20, self.x, self.y - 20)
 
-        if self.children:
-            middle_idx = len(self.children) // 2
-
-            if len(self.children) % 2 != 0:
-                middle_child = self.children[middle_idx]
-                middle_child.x = self.x
-                middle_child.y = self.y + 60
-                middle_child.draw()
-
-                for idx in range(0, middle_idx):
-                    self.draw_odd_child(idx, middle_idx)
-
-                for idx in range(middle_idx + 1, len(self.children)):
-                    self.draw_odd_child(idx, middle_idx)
-
-            else:
-                for idx in range(0, len(self.children)):
-                    self.draw_even_child(idx, middle_idx)
-
-    def draw_odd_child(self, idx, middle_idx):
-        child = self.children[idx]
-        padding = 0
-        if idx < middle_idx:
-            for i in range(idx + 1, middle_idx):
-                padding += self.children[i].width
-            padding += floor(len(self.children) // 2) * 20
-            padding += self.children[middle_idx].width / 2.0
-            padding += child.width / 2.0
-            child.x = self.x - padding
+        location = self.x - (self.width / 2)
+        for child in self.children:
+            location += child.width / 2
+            child.x = location
             child.y = self.y + 60
-        elif idx > middle_idx:
-            for i in range(middle_idx + 1, idx):
-                padding += self.children[i].width
-            padding += floor(len(self.children) // 2) * 20
-            padding += self.children[middle_idx].width / 2.0
-            padding += child.width / 2.0
-            child.x = self.x + padding
-            child.y = self.y + 60
-        child.draw()
+            location += child.width / 2
+            location += 20
 
-    def draw_even_child(self, idx, middle_idx):
-        child = self.children[idx]
-        padding = 0
-        if idx < middle_idx:
-            for i in range(idx + 1, middle_idx):
-                padding += self.children[i].width
-            padding += ((len(self.children) // 2) - idx - 1) * 20
-            padding += 10
-            padding += child.width / 2
-            child.x = self.x - padding
-            child.y = self.y + 60
-        else:
-            for i in range(middle_idx, idx):
-                padding += self.children[i].width
-            padding += (idx - (len(self.children) // 2)) * 20
-            padding += 10
-            padding += child.width / 2
-            child.x = self.x + padding
-            child.y = self.y + 60
-        child.draw()
+        for child in self.children:
+            child.draw()
 
     def calculate_horizontal_distance(self):
         if not self.children:
@@ -157,7 +110,7 @@ def clear():
 
 
 def add_node(node):
-    global current, root, front
+    global current, root, front, tree_size
     if current is None:
         root = TreeNode(data=node.state, parent=None)
         front.append(root)
@@ -173,15 +126,18 @@ def add_node(node):
             parent.children.append(new_node)
             front.append(new_node)
 
+    tree_size += 1
+
 
 def remove_node(node):
-    global front, root
+    global front, root, tree_size
     for leaf in front:
         if leaf.data == node.state:
             if leaf == root or leaf.parent.data == node.parent:
                 papi = leaf.parent
                 papi.children.remove(leaf)
                 front.remove(leaf)
+                tree_size -= 1
                 break
 
 
@@ -197,8 +153,9 @@ def mark_exploring(node):
 
 
 def mark_explored(node):
-    global current
+    global current, visited_count
     current.status = 'd'
+    visited_count += 1
 
 
 def set_path(node):
@@ -224,39 +181,9 @@ def mark_target(node):
 
 
 def reset_tree():
-    global root, current, front
+    global root, current, front, visited_count, tree_size
     root = None
     current = None
     front = []
-
-
-def main():
-    # root = TreeNode("root", None)
-    # parent1 = TreeNode("parent1", root)
-    # child1 = TreeNode("child1", parent1)
-    # child2 = TreeNode("child2", parent1)
-    # child3 = TreeNode("child3", parent1)
-    # child4 = TreeNode("child4", parent1)
-    #
-    # parent2 = TreeNode("parent2", root)
-    # child5 = TreeNode("child5", parent2)
-    # child6 = TreeNode("child6", parent2)
-    # child7 = TreeNode("child7", parent2)
-    # child8 = TreeNode('child8', parent2)
-    # # child10 = SearchNode('child10', parent1)
-    #
-    # grandchild1 = TreeNode("grandchild1", child6)
-    # grandchild2 = TreeNode("grandchild2", child7)
-    # # child9 = SearchNode('child9', parent3)
-    # root.children = [parent1, parent2]
-    # parent1.children = [child1, child2, child3, child4]
-    # parent2.children = [child5, child6, child7, child8]
-    # child6.children = [grandchild1]
-    # child7.children = [grandchild2]
-    #
-    # print(root.horizontal_distance())
-    window.mainloop()
-
-
-if __name__ == '__main__':
-    main()
+    visited_count = 0
+    tree_size = 0
