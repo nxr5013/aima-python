@@ -19,6 +19,8 @@ from utils import (
 
 infinity = float('inf')
 
+MAX_LOOPS = 500
+
 
 # ______________________________________________________________________________
 
@@ -190,8 +192,9 @@ def breadth_first_tree_search(problem):
     reset_tree()
     frontier = deque([Node(problem.initial)])  # FIFO queue
     add_node(frontier[0])
+    count = 0
 
-    while frontier:
+    while frontier and count < MAX_LOOPS:
         node = frontier.popleft()
         mark_exploring(node)
         children = node.expand(problem)
@@ -205,6 +208,8 @@ def breadth_first_tree_search(problem):
             add_node(child)
 
         mark_explored(node)
+        count += 1
+
     return None, None, None
 
 
@@ -217,8 +222,9 @@ def depth_first_tree_search(problem):
     reset_tree()
     frontier = [Node(problem.initial)]  # Stack
     add_node(frontier[0])
+    count = 0
 
-    while frontier:
+    while frontier and count < MAX_LOOPS:
         node = frontier.pop()
         mark_exploring(node)
         children = node.expand(problem)
@@ -232,6 +238,7 @@ def depth_first_tree_search(problem):
             add_node(child)
 
         mark_explored(node)
+        count += 1
 
     return None, None, None
 
