@@ -142,20 +142,20 @@ def remove_node(node):
 
 
 def mark_exploring(node):
-    global front, current
+    global front, current, visited_count
     for n in front:
         if n.data == node.state:
             if n == root or n.parent.data == node.parent.state:
                 n.status = 'e'
                 current = n
                 front.remove(n)
+                visited_count += 1
                 break
 
 
 def mark_explored(node):
     global current, visited_count
     current.status = 'd'
-    visited_count += 1
 
 
 def set_path(node):
@@ -165,7 +165,7 @@ def set_path(node):
 
 
 def mark_target(node):
-    global current, root, front
+    global current, root, front, tree_size, visited_count
 
     if current.data == node.state:
         set_path(current)
@@ -175,9 +175,12 @@ def mark_target(node):
             if child.data == node.state:
                 if child == root or child.parent.data == node.parent.state:
                     set_path(child)
-                    return
+                    return visited_count, tree_size
         add_node(node)
         set_path(front[-1])
+        tree_size += 1
+        # visited_count += 1
+    return visited_count, tree_size
 
 
 def reset_tree():
