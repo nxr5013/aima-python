@@ -4,6 +4,10 @@ from search import *
 from search import breadth_first_tree_search as bfts, depth_first_tree_search as dfts, uniform_cost_search as ucs
 from gui.tree_node import *
 import random
+import matplotlib.pyplot as plt
+import numpy as np
+
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 root = None
 romania_problem = None
@@ -27,6 +31,11 @@ def perform_search(search):
 
     else:
         return None
+
+
+def plot_boxplots(data, title):
+    plt.boxplot(data)
+    plt.show()
 
 
 def main():
@@ -60,6 +69,8 @@ def main():
         print('path_costs = ', path_costs[search])
         print('visited_counts = ', visited_counts[search])
         print('tree_sizes = ', tree_sizes[search])
+
+    plot_boxplots([np.asarray(path_costs['bfs']), np.asarray(path_costs['dfs']), np.asarray(path_costs['ucs'])], 'Path Costs')
 
 
 if __name__ == "__main__":
