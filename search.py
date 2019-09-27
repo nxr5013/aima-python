@@ -9,6 +9,7 @@ import math
 import random
 import sys
 from collections import deque
+from gui.tree_node import *
 
 from utils import (
     is_in, argmin, argmax, argmax_random_tie, probability, weighted_sampler,
@@ -186,14 +187,25 @@ def breadth_first_tree_search(problem):
         The argument frontier should be an empty queue.
         Repeats infinitely in case of loops. [Figure 3.7]"""
 
+    reset_tree()
     frontier = deque([Node(problem.initial)])  # FIFO queue
+    add_node(frontier[0])
 
     while frontier:
         node = frontier.popleft()
+        mark_exploring(node)
+        children = node.expand(problem)
         if problem.goal_test(node.state):
-            return node
-        frontier.extend(node.expand(problem))
-    return None
+            mark_explored(node)
+            v, t = mark_target(node)
+            return node, v, t
+
+        for child in children:
+            frontier.append(child)
+            add_node(child)
+
+        mark_explored(node)
+    return None, None, None
 
 
 def depth_first_tree_search(problem):
@@ -202,14 +214,26 @@ def depth_first_tree_search(problem):
         The argument frontier should be an empty queue.
         Repeats infinitely in case of loops. [Figure 3.7]"""
 
+    reset_tree()
     frontier = [Node(problem.initial)]  # Stack
+    add_node(frontier[0])
 
     while frontier:
         node = frontier.pop()
+        mark_exploring(node)
+        children = node.expand(problem)
         if problem.goal_test(node.state):
-            return node
-        frontier.extend(node.expand(problem))
-    return None
+            mark_explored(node)
+            v, t = mark_target(node)
+            return node, v, t
+
+        for child in children:
+            frontier.append(child)
+            add_node(child)
+
+        mark_explored(node)
+
+    return None, None, None
 
 
 def depth_first_graph_search(problem):
@@ -261,24 +285,32 @@ def best_first_graph_search(problem, f):
     There is a subtlety: the line "f = memoize(f, 'f')" means that the f
     values will be cached on the nodes as they are computed. So after doing
     a best first search you can examine the f values of the path returned."""
+    reset_tree()
     f = memoize(f, 'f')
     node = Node(problem.initial)
     frontier = PriorityQueue('min', f)
     frontier.append(node)
+    add_node(node)
     explored = set()
     while frontier:
         node = frontier.pop()
+        mark_exploring(node)
         if problem.goal_test(node.state):
-            return node
+            mark_explored(node)
+            v, t = mark_target(node)
+            return node, v, t
         explored.add(node.state)
+        mark_explored(node)
         for child in node.expand(problem):
             if child.state not in explored and child not in frontier:
                 frontier.append(child)
+                add_node(child)
             elif child in frontier:
                 if f(child) < frontier[child]:
                     del frontier[child]
                     frontier.append(child)
-    return None
+                    add_node(child)
+    return None, None, None
 
 
 def uniform_cost_search(problem):
