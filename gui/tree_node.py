@@ -7,22 +7,6 @@ front = []
 visited_count = 0
 tree_size = 0
 
-window = Tk()
-window.geometry('800x800')
-canvas = Canvas(window, width=500, height=500, scrollregion=(0,0,10000,10000))
-hbar=Scrollbar(window,orient=HORIZONTAL)
-hbar.pack(side=BOTTOM,fill=X)
-hbar.config(command=canvas.xview)
-
-vbar=Scrollbar(window,orient=VERTICAL)
-vbar.pack(side=RIGHT,fill=Y)
-vbar.config(command=canvas.yview)
-canvas.xview_moveto(0.45)
-canvas.config(xscrollcommand=hbar.set, yscrollcommand=vbar.set)
-
-canvas.pack(side=LEFT,expand=True,fill=BOTH)
-
-
 class TreeNode:
     def __init__(self, data, parent):
         self.data = data
@@ -32,81 +16,6 @@ class TreeNode:
         self.width = 40
         self.x = None
         self.y = None
-
-    def draw(self):
-        global canvas
-        if self.x is None and self.y is None:
-            self.x = self.width / 2.0 + 4900
-            self.y = 100.0
-
-        canvas.create_oval(self.x + 20, self.y + 20, self.x - 20, self.y - 20, fill=self.color())
-        canvas.create_text(self.x, self.y, text=self.data[0])
-
-        if self.parent is not None:
-            canvas.create_line(self.parent.x, self.parent.y + 20, self.x, self.y - 20)
-
-        location = self.x - (self.width / 2)
-        for child in self.children:
-            location += child.width / 2
-            child.x = location
-            child.y = self.y + 60
-            location += child.width / 2
-            location += 20
-
-        for child in self.children:
-            child.draw()
-
-    def calculate_horizontal_distance(self):
-        if not self.children:
-            return 40
-
-        total = 0
-        for child in self.children:
-            total += child.calculate_horizontal_distance()
-
-        self.width = total + ((len(self.children) - 1) * 20)
-        return self.width
-
-    def color(self):
-        if self.status == 'f':
-            return 'orange'
-        elif self.status == 'e':
-            return 'red'
-        elif self.status == 'd':
-            return 'grey'
-        elif self.status == 't':
-            return 'green'
-
-    def find_right_spot(self, node):
-        if self.data == node.parent.state:
-            match = True
-            for child in self.children:
-                if child.data == node.state:
-                    match = False
-                    break
-            if match:
-                return self
-            else:
-                for child in self.children:
-                    spot = child.find_right_spot(node)
-                    if spot is not None:
-                        return spot
-        else:
-            for child in self.children:
-                spot = child.find_right_spot(node)
-                if spot is not None:
-                    return spot
-
-
-def draw_tree():
-    global root
-    clear()
-    root.calculate_horizontal_distance()
-    root.draw()
-
-
-def clear():
-    canvas.delete('all')
 
 
 def add_node(node):
